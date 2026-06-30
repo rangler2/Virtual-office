@@ -181,6 +181,7 @@ function SceneContent({
               : player
           }
           isLocal={player.id === playerId}
+          viewMode={viewMode}
           chatMessages={chatMessages}
         />
       ))}
