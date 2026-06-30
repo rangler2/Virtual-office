@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useDistanceFactor } from '../hooks/useDistanceFactor';
 import type { ChatMessage, Player } from '../types';
 
 const BUBBLE_DURATION_MS = 10_000;
@@ -13,6 +14,7 @@ interface PlayerAvatarProps {
 }
 
 export function PlayerAvatar({ player, isLocal, chatMessages }: PlayerAvatarProps) {
+  const distanceFactor = useDistanceFactor();
   const groupRef = useRef<THREE.Group>(null);
   const targetPos = useRef(new THREE.Vector3(player.x, 0, player.z));
   const targetRot = useRef(player.rotation);
@@ -68,27 +70,24 @@ export function PlayerAvatar({ player, isLocal, chatMessages }: PlayerAvatarProp
         <meshStandardMaterial color="#fde68a" />
       </mesh>
 
-      {/* Chat bubble + name label */}
+      {/* Chat bubble + avatar emoji */}
       <Html
-        position={[0, 1.55, 0]}
+        position={[0, 1.45, 0]}
         center
-        distanceFactor={18}
+        distanceFactor={distanceFactor}
         style={{ pointerEvents: 'none', userSelect: 'none' }}
       >
         <div className="player-overhead">
           {bubbleText && (
             <div className="player-chat-bubble">{bubbleText}</div>
           )}
-          <div className="player-label">
-            <span className="player-label-avatar">{player.avatar}</span>
-            <span className="player-label-name">{player.name}</span>
-            {(player.inOfficeToday || player.inOfficeTomorrow) && (
-              <span className="player-label-badges">
-                {player.inOfficeToday && '📍'}
-                {player.inOfficeTomorrow && '📅'}
-              </span>
-            )}
-          </div>
+          {(player.inOfficeToday || player.inOfficeTomorrow) && (
+            <span className="player-label-badges">
+              {player.inOfficeToday && '📍'}
+              {player.inOfficeTomorrow && '📅'}
+            </span>
+          )}
+          <span className="player-label-avatar">{player.avatar}</span>
         </div>
       </Html>
 

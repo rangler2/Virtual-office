@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import type { Player, ViewMode } from '../types';
 import { ChatPanel } from './ChatPanel';
 import { PresenceToggles } from './PresenceToggles';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 interface GameUIProps {
   players: Record<string, Player>;
@@ -21,6 +23,9 @@ export function GameUI({
   onSendChat,
   onPresenceChange,
 }: GameUIProps) {
+  const isDesktop = useMediaQuery('(min-width: 769px)');
+  const [sidebarOpen, setSidebarOpen] = useState(isDesktop);
+
   const me = playerId ? players[playerId] : null;
   const others = Object.values(players).filter((p) => p.id !== playerId);
 
@@ -28,6 +33,15 @@ export function GameUI({
     <div className="game-ui">
       <header className="top-bar">
         <div className="top-bar-left">
+          <button
+            type="button"
+            className="sidebar-toggle"
+            onClick={() => setSidebarOpen((open) => !open)}
+            aria-label={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+            aria-expanded={sidebarOpen}
+          >
+            {sidebarOpen ? '◀' : '☰'}
+          </button>
           <span className="logo">🏢 Virtual Office</span>
           {me && (
             <span className="player-badge">
@@ -56,7 +70,16 @@ export function GameUI({
         </div>
       </header>
 
-      <aside className="sidebar">
+      {!isDesktop && sidebarOpen && (
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          onClick={() => setSidebarOpen(false)}
+          aria-label="Close sidebar"
+        />
+      )}
+
+      <aside className={`sidebar ${sidebarOpen ? 'open' : 'collapsed'}`}>
         <PresenceToggles
           inOfficeToday={me?.inOfficeToday ?? false}
           inOfficeTomorrow={me?.inOfficeTomorrow ?? false}
@@ -94,7 +117,10 @@ export function GameUI({
 
         <div className="controls-hint">
           <h4>Controls</h4>
-          <p>WASD or arrow keys to move</p>
+          <p className="controls-desktop">WASD or arrow keys to move</p>
+          <p className="controls-mobile">
+            Tap to walk · Drag to pan (map) or look (1st person)
+          </p>
         </div>
       </aside>
 

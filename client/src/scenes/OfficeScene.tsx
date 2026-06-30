@@ -1,13 +1,16 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { officeLayout, getMovementBounds } from '../config/officeLayout';
 import { OfficeEnvironment } from './OfficeEnvironment';
 import { PlayerAvatar } from './PlayerAvatar';
 import { CameraController } from './CameraController';
+import { SceneControls, type ViewportPan } from './SceneControls';
 import { useKeyboard } from '../hooks/useKeyboard';
 import type { ChatMessage, Player, ViewMode } from '../types';
 
 const MOVE_SPEED = 4;
+const ARRIVE_DISTANCE = 0.2;
+const MAX_LOOK_PITCH = 1.2;
 const bounds = getMovementBounds(officeLayout);
 
 interface OfficeSceneProps {
@@ -18,16 +21,26 @@ interface OfficeSceneProps {
   onMove: (x: number, z: number, rotation: number) => void;
 }
 
+interface SceneContentProps extends OfficeSceneProps {
+  viewportPan: ViewportPan;
+  onViewportPanChange: (pan: ViewportPan) => void;
+}
+
 function SceneContent({
   players,
   playerId,
   chatMessages,
   viewMode,
   onMove,
-}: OfficeSceneProps) {
+  viewportPan,
+  onViewportPanChange,
+}: SceneContentProps) {
   const keysRef = useKeyboard(!!playerId);
   const localState = useRef({ x: officeLayout.spawn.x, z: officeLayout.spawn.z, rotation: 0 });
+  const walkTarget = useRef<{ x: number; z: number } | null>(null);
+  const lookPitch = useRef(0);
   const lastEmit = useRef(0);
+  const [, forceRender] = useState(0);
 
   useEffect(() => {
     const me = playerId ? players[playerId] : null;
@@ -35,6 +48,39 @@ function SceneContent({
       localState.current = { x: me.x, z: me.z, rotation: me.rotation };
     }
   }, [playerId, players]);
+
+  useEffect(() => {
+    lookPitch.current = 0;
+    walkTarget.current = null;
+  }, [viewMode]);
+
+  const emitMove = useCallback(
+    (now: number, x: number, z: number, rotation: number) => {
+      if (now - lastEmit.current > 50) {
+        lastEmit.current = now;
+        onMove(x, z, rotation);
+      }
+    },
+    [onMove],
+  );
+
+  const handleWalkTarget = useCallback((x: number, z: number) => {
+    walkTarget.current = { x, z };
+  }, []);
+
+  const handleLookChange = useCallback(
+    (yawDelta: number, pitchDelta: number) => {
+      const { x, z, rotation } = localState.current;
+      localState.current.rotation = rotation + yawDelta;
+      lookPitch.current = Math.max(
+        -MAX_LOOK_PITCH,
+        Math.min(MAX_LOOK_PITCH, lookPitch.current + pitchDelta),
+      );
+      emitMove(performance.now(), x, z, localState.current.rotation);
+      forceRender((n) => n + 1);
+    },
+    [emitMove],
+  );
 
   useEffect(() => {
     let animId: number;
@@ -58,7 +104,10 @@ function SceneContent({
       if (keys.left) dx -= 1;
       if (keys.right) dx += 1;
 
-      if (dx !== 0 || dz !== 0) {
+      const keyboardMoving = dx !== 0 || dz !== 0;
+
+      if (keyboardMoving) {
+        walkTarget.current = null;
         const len = Math.sqrt(dx * dx + dz * dz);
         dx /= len;
         dz /= len;
@@ -69,10 +118,27 @@ function SceneContent({
         const newRot = Math.atan2(dx, dz);
 
         localState.current = { x: newX, z: newZ, rotation: newRot };
+        emitMove(now, newX, newZ, newRot);
+      } else if (walkTarget.current) {
+        const { x, z, rotation } = localState.current;
+        const tx = walkTarget.current.x;
+        const tz = walkTarget.current.z;
+        const toX = tx - x;
+        const toZ = tz - z;
+        const dist = Math.sqrt(toX * toX + toZ * toZ);
 
-        if (now - lastEmit.current > 50) {
-          lastEmit.current = now;
-          onMove(newX, newZ, newRot);
+        if (dist < ARRIVE_DISTANCE) {
+          walkTarget.current = null;
+          localState.current = { x: tx, z: tz, rotation };
+          emitMove(now, tx, tz, rotation);
+        } else {
+          const step = Math.min(dist, MOVE_SPEED * dt);
+          const nx = x + (toX / dist) * step;
+          const nz = z + (toZ / dist) * step;
+          const newRot = Math.atan2(toX, toZ);
+
+          localState.current = { x: nx, z: nz, rotation: newRot };
+          emitMove(now, nx, nz, newRot);
         }
       }
 
@@ -81,12 +147,12 @@ function SceneContent({
 
     animId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animId);
-  }, [playerId, keysRef, onMove]);
+  }, [playerId, keysRef, emitMove]);
 
   const me = playerId ? players[playerId] : null;
-  const camX = me?.x ?? officeLayout.spawn.x;
-  const camZ = me?.z ?? officeLayout.spawn.z;
-  const camRot = me?.rotation ?? 0;
+  const camX = playerId ? localState.current.x : (me?.x ?? officeLayout.spawn.x);
+  const camZ = playerId ? localState.current.z : (me?.z ?? officeLayout.spawn.z);
+  const camRot = localState.current.rotation;
 
   return (
     <>
@@ -124,6 +190,17 @@ function SceneContent({
         playerX={camX}
         playerZ={camZ}
         playerRotation={camRot}
+        lookPitch={lookPitch.current}
+        panX={viewportPan.x}
+        panZ={viewportPan.z}
+      />
+
+      <SceneControls
+        viewMode={viewMode}
+        viewportPan={viewportPan}
+        onViewportPanChange={onViewportPanChange}
+        onWalkTarget={handleWalkTarget}
+        onLookChange={handleLookChange}
       />
     </>
   );
@@ -131,6 +208,12 @@ function SceneContent({
 
 export function OfficeScene(props: OfficeSceneProps) {
   const isIso = props.viewMode === 'isometric';
+  const [viewportPan, setViewportPan] = useState<ViewportPan>({ x: 0, z: 0 });
+  const handleViewportPanChange = useCallback((pan: ViewportPan) => setViewportPan(pan), []);
+
+  useEffect(() => {
+    setViewportPan({ x: 0, z: 0 });
+  }, [props.viewMode]);
 
   return (
     <Canvas
@@ -157,7 +240,11 @@ export function OfficeScene(props: OfficeSceneProps) {
         gl.setClearColor('#1a1a2e');
       }}
     >
-      <SceneContent {...props} />
+      <SceneContent
+        {...props}
+        viewportPan={viewportPan}
+        onViewportPanChange={handleViewportPanChange}
+      />
     </Canvas>
   );
 }

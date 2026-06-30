@@ -172,6 +172,7 @@ body,
 .office-canvas {
   width: 100% !important;
   height: 100% !important;
+  touch-action: none;
 }
 
 /* ── Game UI ── */
@@ -216,6 +217,26 @@ body,
 .logo {
   font-weight: 600;
   font-size: 0.95rem;
+}
+
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .player-badge {
@@ -276,6 +297,23 @@ body,
   backdrop-filter: blur(12px);
   border-right: 1px solid var(--border);
   overflow-y: auto;
+  transition: transform 0.25s ease;
+  z-index: 15;
+}
+
+.sidebar.collapsed {
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+.sidebar-backdrop {
+  position: absolute;
+  inset: 0;
+  top: 60px;
+  border: none;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 14;
+  cursor: pointer;
 }
 
 .presence-toggles {
@@ -431,6 +469,14 @@ body,
 .controls-hint p {
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+.controls-mobile {
+  display: none;
+}
+
+.controls-desktop {
+  display: block;
 }
 
 /* ── Chat ── */
@@ -623,25 +669,89 @@ body,
   }
 }
 
-.player-label {
-  display: flex;
-  align-items: center;
-  gap: 0.15rem;
-  white-space: nowrap;
-  font-family: var(--font);
-  font-size: 9px;
-  color: white;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-}
-
 .player-label-avatar {
   font-size: 10px;
-}
-
-.player-label-name {
-  font-weight: 600;
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 
 .player-label-badges {
   font-size: 8px;
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+/* ── Mobile ── */
+
+@media (max-width: 768px) {
+  .top-bar {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .top-bar-left,
+  .top-bar-right {
+    min-width: 0;
+    gap: 0.4rem;
+  }
+
+  .logo {
+    font-size: 0.8rem;
+  }
+
+  .player-badge {
+    display: none;
+  }
+
+  .view-toggle button {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .online-count {
+    font-size: 0.75rem;
+  }
+
+  .sidebar {
+    width: min(280px, 85vw);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .sidebar.open {
+    pointer-events: auto;
+  }
+
+  .chat-panel {
+    width: calc(100vw - 2rem);
+    max-width: 340px;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    max-height: 40vh;
+  }
+
+  .chat-toggle {
+    bottom: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .controls-desktop {
+    display: none;
+  }
+
+  .controls-mobile {
+    display: block;
+  }
+
+  .player-chat-bubble {
+    max-width: 90px;
+    padding: 0.2rem 0.3rem;
+    font-size: 7px;
+  }
+
+  .player-label-avatar {
+    font-size: 8px;
+  }
+
+  .player-label-badges {
+    font-size: 7px;
+  }
 }

@@ -8,6 +8,9 @@ interface CameraControllerProps {
   playerX: number;
   playerZ: number;
   playerRotation: number;
+  lookPitch: number;
+  panX?: number;
+  panZ?: number;
 }
 
 export function CameraController({
@@ -15,6 +18,9 @@ export function CameraController({
   playerX,
   playerZ,
   playerRotation,
+  lookPitch,
+  panX = 0,
+  panZ = 0,
 }: CameraControllerProps) {
   const { camera, size } = useThree();
   const isoTarget = useRef(new THREE.Vector3());
@@ -24,17 +30,12 @@ export function CameraController({
     if (viewMode === 'isometric') {
       camera.near = 0.1;
       camera.far = 200;
-      if (!(camera instanceof THREE.OrthographicCamera)) {
-        // Camera type is set in Canvas; just update projection
-      }
       camera.updateProjectionMatrix();
-    } else {
-      if (camera instanceof THREE.PerspectiveCamera) {
-        camera.fov = 75;
-        camera.near = 0.1;
-        camera.far = 100;
-        camera.updateProjectionMatrix();
-      }
+    } else if (camera instanceof THREE.PerspectiveCamera) {
+      camera.fov = 75;
+      camera.near = 0.1;
+      camera.far = 100;
+      camera.updateProjectionMatrix();
     }
   }, [viewMode, camera, size]);
 
@@ -49,7 +50,7 @@ export function CameraController({
       ortho.bottom = -frustum / 2;
       ortho.updateProjectionMatrix();
 
-      isoTarget.current.set(playerX, 0, playerZ);
+      isoTarget.current.set(playerX + panX, 0, playerZ + panZ);
       const camOffset = new THREE.Vector3(14, 14, 14);
       const desiredPos = isoTarget.current.clone().add(camOffset);
       camera.position.lerp(desiredPos, 0.1);
@@ -60,9 +61,11 @@ export function CameraController({
       camera.position.lerp(fpTarget.current, 0.2);
 
       const lookDistance = 5;
-      const lookX = playerX + Math.sin(playerRotation) * lookDistance;
-      const lookZ = playerZ + Math.cos(playerRotation) * lookDistance;
-      camera.lookAt(lookX, eyeHeight, lookZ);
+      const cosPitch = Math.cos(lookPitch);
+      const lookX = playerX + Math.sin(playerRotation) * cosPitch * lookDistance;
+      const lookY = eyeHeight + Math.sin(lookPitch) * lookDistance;
+      const lookZ = playerZ + Math.cos(playerRotation) * cosPitch * lookDistance;
+      camera.lookAt(lookX, lookY, lookZ);
     }
   });
 
