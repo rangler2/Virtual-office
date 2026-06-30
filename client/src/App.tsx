@@ -39,6 +39,7 @@ export default function App() {
       <OfficeScene
         players={players}
         playerId={playerId}
+        chatMessages={chatMessages}
         viewMode={viewMode}
         onMove={move}
       />
