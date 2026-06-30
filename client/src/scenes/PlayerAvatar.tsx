@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useDistanceFactor } from '../hooks/useDistanceFactor';
 import type { ChatMessage, Player } from '../types';
 
 const BUBBLE_DURATION_MS = 10_000;
@@ -13,6 +14,7 @@ interface PlayerAvatarProps {
 }
 
 export function PlayerAvatar({ player, isLocal, chatMessages }: PlayerAvatarProps) {
+  const distanceFactor = useDistanceFactor();
   const groupRef = useRef<THREE.Group>(null);
   const targetPos = useRef(new THREE.Vector3(player.x, 0, player.z));
   const targetRot = useRef(player.rotation);
@@ -72,7 +74,7 @@ export function PlayerAvatar({ player, isLocal, chatMessages }: PlayerAvatarProp
       <Html
         position={[0, 1.55, 0]}
         center
-        distanceFactor={18}
+        distanceFactor={distanceFactor}
         style={{ pointerEvents: 'none', userSelect: 'none' }}
       >
         <div className="player-overhead">

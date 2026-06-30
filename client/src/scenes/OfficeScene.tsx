@@ -1,9 +1,10 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { officeLayout, getMovementBounds } from '../config/officeLayout';
 import { OfficeEnvironment } from './OfficeEnvironment';
 import { PlayerAvatar } from './PlayerAvatar';
 import { CameraController } from './CameraController';
+import { ViewportPanControls, type ViewportPan } from './ViewportPanControls';
 import { useKeyboard } from '../hooks/useKeyboard';
 import type { ChatMessage, Player, ViewMode } from '../types';
 
@@ -18,13 +19,20 @@ interface OfficeSceneProps {
   onMove: (x: number, z: number, rotation: number) => void;
 }
 
+interface SceneContentProps extends OfficeSceneProps {
+  viewportPan: ViewportPan;
+  onViewportPanChange: (pan: ViewportPan) => void;
+}
+
 function SceneContent({
   players,
   playerId,
   chatMessages,
   viewMode,
   onMove,
-}: OfficeSceneProps) {
+  viewportPan,
+  onViewportPanChange,
+}: SceneContentProps) {
   const keysRef = useKeyboard(!!playerId);
   const localState = useRef({ x: officeLayout.spawn.x, z: officeLayout.spawn.z, rotation: 0 });
   const lastEmit = useRef(0);
@@ -124,6 +132,14 @@ function SceneContent({
         playerX={camX}
         playerZ={camZ}
         playerRotation={camRot}
+        panX={viewportPan.x}
+        panZ={viewportPan.z}
+      />
+
+      <ViewportPanControls
+        viewMode={viewMode}
+        pan={viewportPan}
+        onPanChange={onViewportPanChange}
       />
     </>
   );
@@ -131,6 +147,12 @@ function SceneContent({
 
 export function OfficeScene(props: OfficeSceneProps) {
   const isIso = props.viewMode === 'isometric';
+  const [viewportPan, setViewportPan] = useState<ViewportPan>({ x: 0, z: 0 });
+  const handleViewportPanChange = useCallback((pan: ViewportPan) => setViewportPan(pan), []);
+
+  useEffect(() => {
+    setViewportPan({ x: 0, z: 0 });
+  }, [props.viewMode]);
 
   return (
     <Canvas
@@ -157,7 +179,11 @@ export function OfficeScene(props: OfficeSceneProps) {
         gl.setClearColor('#1a1a2e');
       }}
     >
-      <SceneContent {...props} />
+      <SceneContent
+        {...props}
+        viewportPan={viewportPan}
+        onViewportPanChange={handleViewportPanChange}
+      />
     </Canvas>
   );
 }
