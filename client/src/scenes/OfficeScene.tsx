@@ -5,7 +5,7 @@ import { OfficeEnvironment } from './OfficeEnvironment';
 import { PlayerAvatar } from './PlayerAvatar';
 import { CameraController } from './CameraController';
 import { useKeyboard } from '../hooks/useKeyboard';
-import type { Player, ViewMode } from '../types';
+import type { ChatMessage, Player, ViewMode } from '../types';
 
 const MOVE_SPEED = 4;
 const bounds = getMovementBounds(officeLayout);
@@ -13,6 +13,7 @@ const bounds = getMovementBounds(officeLayout);
 interface OfficeSceneProps {
   players: Record<string, Player>;
   playerId: string | null;
+  chatMessages: ChatMessage[];
   viewMode: ViewMode;
   onMove: (x: number, z: number, rotation: number) => void;
 }
@@ -20,6 +21,7 @@ interface OfficeSceneProps {
 function SceneContent({
   players,
   playerId,
+  chatMessages,
   viewMode,
   onMove,
 }: OfficeSceneProps) {
@@ -113,6 +115,7 @@ function SceneContent({
               : player
           }
           isLocal={player.id === playerId}
+          chatMessages={chatMessages}
         />
       ))}
 

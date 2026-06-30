@@ -1,18 +1,43 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import type { Player } from '../types';
+import type { ChatMessage, Player } from '../types';
+
+const BUBBLE_DURATION_MS = 10_000;
 
 interface PlayerAvatarProps {
   player: Player;
   isLocal: boolean;
+  chatMessages: ChatMessage[];
 }
 
-export function PlayerAvatar({ player, isLocal }: PlayerAvatarProps) {
+export function PlayerAvatar({ player, isLocal, chatMessages }: PlayerAvatarProps) {
   const groupRef = useRef<THREE.Group>(null);
   const targetPos = useRef(new THREE.Vector3(player.x, 0, player.z));
   const targetRot = useRef(player.rotation);
+  const [bubbleText, setBubbleText] = useState<string | null>(null);
+  const lastBubbleMsgId = useRef<string | null>(null);
+  const skipHistory = useRef(true);
+
+  useEffect(() => {
+    const playerMsgs = chatMessages.filter((m) => m.playerId === player.id);
+    const latest = playerMsgs[playerMsgs.length - 1];
+
+    if (skipHistory.current) {
+      skipHistory.current = false;
+      if (latest) lastBubbleMsgId.current = latest.id;
+      return;
+    }
+
+    if (!latest || latest.id === lastBubbleMsgId.current) return;
+
+    lastBubbleMsgId.current = latest.id;
+    setBubbleText(latest.message);
+
+    const timer = window.setTimeout(() => setBubbleText(null), BUBBLE_DURATION_MS);
+    return () => window.clearTimeout(timer);
+  }, [chatMessages, player.id]);
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -43,22 +68,27 @@ export function PlayerAvatar({ player, isLocal }: PlayerAvatarProps) {
         <meshStandardMaterial color="#fde68a" />
       </mesh>
 
-      {/* Name + avatar label */}
+      {/* Chat bubble + name label */}
       <Html
         position={[0, 1.55, 0]}
         center
-        distanceFactor={8}
+        distanceFactor={18}
         style={{ pointerEvents: 'none', userSelect: 'none' }}
       >
-        <div className="player-label">
-          <span className="player-label-avatar">{player.avatar}</span>
-          <span className="player-label-name">{player.name}</span>
-          {(player.inOfficeToday || player.inOfficeTomorrow) && (
-            <span className="player-label-badges">
-              {player.inOfficeToday && '📍'}
-              {player.inOfficeTomorrow && '📅'}
-            </span>
+        <div className="player-overhead">
+          {bubbleText && (
+            <div className="player-chat-bubble">{bubbleText}</div>
           )}
+          <div className="player-label">
+            <span className="player-label-avatar">{player.avatar}</span>
+            <span className="player-label-name">{player.name}</span>
+            {(player.inOfficeToday || player.inOfficeTomorrow) && (
+              <span className="player-label-badges">
+                {player.inOfficeToday && '📍'}
+                {player.inOfficeTomorrow && '📅'}
+              </span>
+            )}
+          </div>
         </div>
       </Html>
 
