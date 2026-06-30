@@ -1,0 +1,605 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-dark: #0f0f1a;
+  --bg-card: #1a1a2e;
+  --bg-panel: rgba(26, 26, 46, 0.92);
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border: rgba(255, 255, 255, 0.08);
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --radius: 12px;
+  --font: 'DM Sans', system-ui, sans-serif;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font);
+  background: var(--bg-dark);
+  color: var(--text);
+}
+
+/* ── Join Screen ── */
+
+.join-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: radial-gradient(ellipse at 50% 0%, #1e1b4b 0%, var(--bg-dark) 70%);
+}
+
+.join-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: min(420px, 92vw);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+.join-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.join-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.join-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.join-header p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+  margin-top: 1rem;
+}
+
+.join-card input[type='text'] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.join-card input[type='text']:focus {
+  border-color: var(--accent);
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.avatar-btn {
+  aspect-ratio: 1;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.08);
+}
+
+.avatar-btn.selected {
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.2);
+}
+
+.join-btn {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0.85rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: white;
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.join-btn:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.join-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.join-hint {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 1rem;
+}
+
+/* ── App Layout ── */
+
+.app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.office-canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Game UI ── */
+
+.game-ui {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.game-ui > * {
+  pointer-events: auto;
+}
+
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-panel);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.top-bar-left,
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 160px;
+}
+
+.top-bar-right {
+  justify-content: flex-end;
+}
+
+.logo {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.player-badge {
+  background: rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 0.2rem;
+}
+
+.view-toggle button {
+  padding: 0.4rem 0.85rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.view-toggle button.active {
+  background: var(--accent);
+  color: white;
+}
+
+.view-toggle button:hover:not(.active) {
+  color: var(--text);
+}
+
+.online-count {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── Sidebar ── */
+
+.sidebar {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 240px;
+  bottom: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--bg-panel);
+  backdrop-filter: blur(12px);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+.presence-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius);
+  cursor: pointer;
+  position: relative;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.toggle-icon {
+  font-size: 1rem;
+}
+
+.toggle-row input[type='checkbox'] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-switch {
+  width: 36px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.toggle-row input:checked ~ .toggle-switch {
+  background: var(--accent);
+}
+
+.toggle-row input:checked ~ .toggle-switch::after {
+  transform: translateX(16px);
+}
+
+.colleagues-panel h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.colleague-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.colleague-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.colleague-avatar {
+  font-size: 1.2rem;
+}
+
+.colleague-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.colleague-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.colleague-badges {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.15rem;
+}
+
+.badge {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.badge-today {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.badge-tomorrow {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+}
+
+.colleague-empty {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: 0.5rem;
+}
+
+.controls-hint {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.controls-hint h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.controls-hint p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ── Chat ── */
+
+.chat-panel {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  width: 340px;
+  max-height: 360px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.chat-toggle {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  color: var(--text);
+  font-family: var(--font);
+  cursor: pointer;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 120px;
+  max-height: 240px;
+}
+
+.chat-empty {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.chat-message {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.chat-message.own .chat-body {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.chat-avatar {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.chat-body {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-name {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent-hover);
+  margin-bottom: 0.1rem;
+}
+
+.chat-text {
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.chat-input-row input {
+  flex: 1;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.chat-input-row input:focus {
+  border-color: var(--accent);
+}
+
+.chat-input-row button {
+  padding: 0.45rem 0.85rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chat-input-row button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── 3D Player Labels ── */
+
+.player-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(15, 15, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 0.15rem 0.45rem;
+  white-space: nowrap;
+  font-family: var(--font);
+  font-size: 11px;
+  color: white;
+  backdrop-filter: blur(4px);
+}
+
+.player-label-avatar {
+  font-size: 13px;
+}
+
+.player-label-name {
+  font-weight: 600;
+}
+
+.player-label-badges {
+  font-size: 10px;
+}
