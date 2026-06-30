@@ -8,6 +8,8 @@ interface CameraControllerProps {
   playerX: number;
   playerZ: number;
   playerRotation: number;
+  panX?: number;
+  panZ?: number;
 }
 
 export function CameraController({
@@ -15,6 +17,8 @@ export function CameraController({
   playerX,
   playerZ,
   playerRotation,
+  panX = 0,
+  panZ = 0,
 }: CameraControllerProps) {
   const { camera, size } = useThree();
   const isoTarget = useRef(new THREE.Vector3());
@@ -49,7 +53,7 @@ export function CameraController({
       ortho.bottom = -frustum / 2;
       ortho.updateProjectionMatrix();
 
-      isoTarget.current.set(playerX, 0, playerZ);
+      isoTarget.current.set(playerX + panX, 0, playerZ + panZ);
       const camOffset = new THREE.Vector3(14, 14, 14);
       const desiredPos = isoTarget.current.clone().add(camOffset);
       camera.position.lerp(desiredPos, 0.1);
