@@ -104,6 +104,9 @@ io.on('connection', (socket) => {
 });
 
 const clientDist = path.join(__dirname, '../client/dist');
+app.get('/health', (_req, res) => {
+  res.json({ ok: true });
+});
 app.use(express.static(clientDist));
 app.get('*', (_req, res) => {
   res.sendFile(path.join(clientDist, 'index.html'));

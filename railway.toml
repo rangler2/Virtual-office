@@ -1,0 +1,11 @@
+# Deploy as ONE service from the repo root.
+# The server builds the React client, then serves it + Socket.io together.
+# Do not deploy client/ and server/ as separate Railway services.
+
+[build]
+buildCommand = "npm install && npm run build"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/health"
+restartPolicyType = "ON_FAILURE"
