@@ -2,7 +2,6 @@ import { useRef, useState, useEffect } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useDistanceFactor } from '../hooks/useDistanceFactor';
 import type { ChatMessage, Player, ViewMode } from '../types';
 
 const BUBBLE_DURATION_MS = 10_000;
@@ -15,7 +14,6 @@ interface PlayerAvatarProps {
 }
 
 export function PlayerAvatar({ player, isLocal, viewMode, chatMessages }: PlayerAvatarProps) {
-  const distanceFactor = useDistanceFactor(viewMode);
   const hideInFirstPerson = isLocal && viewMode === 'firstPerson';
   const groupRef = useRef<THREE.Group>(null);
   const targetPos = useRef(new THREE.Vector3(player.x, 0, player.z));
@@ -76,22 +74,24 @@ export function PlayerAvatar({ player, isLocal, viewMode, chatMessages }: Player
 
           {/* Chat bubble + avatar emoji */}
           <Html
-            position={[0, 1.45, 0]}
+            position={[0, 1.55, 0]}
             center
-            distanceFactor={distanceFactor}
+            distanceFactor={18}
             style={{ pointerEvents: 'none', userSelect: 'none' }}
           >
             <div className="player-overhead">
               {bubbleText && (
                 <div className="player-chat-bubble">{bubbleText}</div>
               )}
-              {(player.inOfficeToday || player.inOfficeTomorrow) && (
-                <span className="player-label-badges">
-                  {player.inOfficeToday && '📍'}
-                  {player.inOfficeTomorrow && '📅'}
-                </span>
-              )}
-              <span className="player-label-avatar">{player.avatar}</span>
+              <div className="player-label">
+                <span className="player-label-avatar">{player.avatar}</span>
+                {(player.inOfficeToday || player.inOfficeTomorrow) && (
+                  <span className="player-label-badges">
+                    {player.inOfficeToday && '📍'}
+                    {player.inOfficeTomorrow && '📅'}
+                  </span>
+                )}
+              </div>
             </div>
           </Html>
 

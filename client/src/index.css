@@ -669,16 +669,23 @@ body,
   }
 }
 
+.player-label {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  white-space: nowrap;
+  font-family: var(--font);
+  font-size: 9px;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
 .player-label-avatar {
   font-size: 10px;
-  line-height: 1;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 
 .player-label-badges {
   font-size: 8px;
-  line-height: 1;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 
 /* ── Mobile ── */
@@ -744,14 +751,6 @@ body,
   .player-chat-bubble {
     max-width: 90px;
     padding: 0.2rem 0.3rem;
-    font-size: 7px;
-  }
-
-  .player-label-avatar {
-    font-size: 8px;
-  }
-
-  .player-label-badges {
     font-size: 7px;
   }
 }
