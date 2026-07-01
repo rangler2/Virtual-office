@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-const EMOJI_DRAW_SIZE = 96;
-const LABEL_HEIGHT_PX = 96;
+const EMOJI_DRAW_SIZE = 192;
+const LABEL_HEIGHT_PX = 192;
 
 export function createLabelTexture(
   emoji: string,
@@ -10,9 +10,9 @@ export function createLabelTexture(
 ): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d')!;
-  const padX = 8;
-  const gap = 6;
-  const nameFont = '600 28px system-ui, sans-serif';
+  const padX = 16;
+  const gap = 12;
+  const nameFont = '600 56px system-ui, sans-serif';
   const displayName = name.length > 14 ? `${name.slice(0, 13)}…` : name;
 
   ctx.font = nameFont;
@@ -33,7 +33,7 @@ export function createLabelTexture(
   if (badge) {
     ctx.font = `${Math.round(EMOJI_DRAW_SIZE * 0.22)}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
     ctx.textAlign = 'right';
-    ctx.fillText(badge, padX + EMOJI_DRAW_SIZE - 4, 18);
+    ctx.fillText(badge, padX + EMOJI_DRAW_SIZE - 8, 36);
   }
 
   const nameX = padX + EMOJI_DRAW_SIZE + gap;
@@ -41,7 +41,7 @@ export function createLabelTexture(
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
-  ctx.fillText(displayName, nameX + 1, LABEL_HEIGHT_PX / 2 + 1);
+  ctx.fillText(displayName, nameX + 2, LABEL_HEIGHT_PX / 2 + 2);
   ctx.fillStyle = '#ffffff';
   ctx.fillText(displayName, nameX, LABEL_HEIGHT_PX / 2);
 
@@ -81,11 +81,11 @@ function roundRect(
 export function createBubbleTexture(text: string): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d')!;
-  const font = '600 13px system-ui, sans-serif';
-  const maxTextWidth = 160;
-  const padX = 10;
-  const padY = 7;
-  const lineHeight = 16;
+  const font = '600 26px system-ui, sans-serif';
+  const maxTextWidth = 320;
+  const padX = 20;
+  const padY = 14;
+  const lineHeight = 32;
 
   ctx.font = font;
   const words = text.split(/\s+/);
@@ -116,7 +116,7 @@ export function createBubbleTexture(text: string): THREE.CanvasTexture {
 
   ctx.font = font;
   ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
-  roundRect(ctx, 0, 0, width, height, 8);
+  roundRect(ctx, 0, 0, width, height, 16);
   ctx.fill();
 
   ctx.fillStyle = '#1a1a2e';
@@ -140,6 +140,6 @@ export function texturePlaneSize(texture: THREE.CanvasTexture, height: number) {
 }
 
 /** World-space width/height for a bubble texture plane. */
-export function bubblePlaneSize(texture: THREE.CanvasTexture, height = 0.22) {
+export function bubblePlaneSize(texture: THREE.CanvasTexture, height = 0.44) {
   return texturePlaneSize(texture, height);
 }

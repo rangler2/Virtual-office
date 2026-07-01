@@ -15,7 +15,8 @@ interface PlayerOverheadProps {
   inOfficeTomorrow: boolean;
 }
 
-const LABEL_HEIGHT = 0.48;
+const LABEL_HEIGHT = 0.96;
+const BUBBLE_HEIGHT = 0.44;
 
 export function PlayerOverhead({
   emoji,
@@ -39,7 +40,7 @@ export function PlayerOverhead({
   useEffect(() => () => bubbleTexture?.dispose(), [bubbleTexture]);
 
   const labelSize = texturePlaneSize(labelTexture, LABEL_HEIGHT);
-  const bubbleSize = bubbleTexture ? bubblePlaneSize(bubbleTexture) : null;
+  const bubbleSize = bubbleTexture ? bubblePlaneSize(bubbleTexture, BUBBLE_HEIGHT) : null;
 
   return (
     <group position={[0, 1.55, 0]}>
