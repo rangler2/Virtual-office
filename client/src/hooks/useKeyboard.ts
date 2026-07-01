@@ -1,10 +1,25 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type MutableRefObject } from 'react';
 
 export interface Keys {
   forward: boolean;
   backward: boolean;
   left: boolean;
   right: boolean;
+}
+
+function isEditableElement(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  const tag = target.tagName;
+  return tag === 'INPUT' || tag === 'TEXTAREA' || target.isContentEditable;
+}
+
+function resetKeys(keysRef: MutableRefObject<Keys>) {
+  keysRef.current = {
+    forward: false,
+    backward: false,
+    left: false,
+    right: false,
+  };
 }
 
 export function useKeyboard(enabled: boolean) {
@@ -16,7 +31,10 @@ export function useKeyboard(enabled: boolean) {
   });
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      resetKeys(keysRef);
+      return;
+    }
 
     const keyMap: Record<string, keyof Keys> = {
       KeyW: 'forward',
@@ -30,6 +48,8 @@ export function useKeyboard(enabled: boolean) {
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
+      if (isEditableElement(e.target)) return;
+
       const key = keyMap[e.code];
       if (key) {
         e.preventDefault();
@@ -38,18 +58,29 @@ export function useKeyboard(enabled: boolean) {
     };
 
     const onKeyUp = (e: KeyboardEvent) => {
+      if (isEditableElement(e.target)) return;
+
       const key = keyMap[e.code];
       if (key) {
         keysRef.current[key] = false;
       }
     };
 
+    const onFocusIn = (e: FocusEvent) => {
+      if (isEditableElement(e.target)) {
+        resetKeys(keysRef);
+      }
+    };
+
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('focusin', onFocusIn);
 
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('focusin', onFocusIn);
+      resetKeys(keysRef);
     };
   }, [enabled]);
 
