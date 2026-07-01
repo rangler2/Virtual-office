@@ -25,7 +25,10 @@ export function PlayerOverhead({
   inOfficeToday,
   inOfficeTomorrow,
 }: PlayerOverheadProps) {
-  const badge = [inOfficeToday && '📍', inOfficeTomorrow && '📅'].filter(Boolean).join('');
+  const badge = [
+    inOfficeToday && 'Today',
+    inOfficeTomorrow && 'Tmrw',
+  ].filter(Boolean).join(' ');
 
   const labelTexture = useMemo(
     () => createLabelTexture(emoji, name, badge),

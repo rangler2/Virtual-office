@@ -27,7 +27,10 @@ export function GameUI({
   const [sidebarOpen, setSidebarOpen] = useState(isDesktop);
 
   const me = playerId ? players[playerId] : null;
-  const others = Object.values(players).filter((p) => p.id !== playerId);
+  const colleagues = [
+    ...(me ? [me] : []),
+    ...Object.values(players).filter((p) => p.id !== playerId),
+  ];
 
   return (
     <div className="game-ui">
@@ -87,25 +90,31 @@ export function GameUI({
         />
 
         <div className="colleagues-panel">
-          <h3>Colleagues ({others.length})</h3>
+          <h3>Colleagues ({colleagues.length})</h3>
           <ul className="colleague-list">
-            {others.length === 0 && (
-              <li className="colleague-empty">You're the first one here!</li>
+            {colleagues.length === 0 && (
+              <li className="colleague-empty">No one here yet</li>
             )}
-            {others.map((p) => (
-              <li key={p.id} className="colleague-item">
+            {colleagues.map((p) => (
+              <li
+                key={p.id}
+                className={`colleague-item ${p.id === playerId ? 'colleague-item-you' : ''}`}
+              >
                 <span className="colleague-avatar">{p.avatar}</span>
                 <div className="colleague-info">
-                  <span className="colleague-name">{p.name}</span>
+                  <span className="colleague-name">
+                    {p.name}
+                    {p.id === playerId && <span className="colleague-you-tag"> (you)</span>}
+                  </span>
                   <div className="colleague-badges">
                     {p.inOfficeToday && (
                       <span className="badge badge-today" title="In office today">
-                        📍 Today
+                        Today
                       </span>
                     )}
                     {p.inOfficeTomorrow && (
                       <span className="badge badge-tomorrow" title="In office tomorrow">
-                        📅 Tomorrow
+                        Tmrw
                       </span>
                     )}
                   </div>

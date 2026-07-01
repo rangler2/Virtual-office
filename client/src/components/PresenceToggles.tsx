@@ -12,10 +12,7 @@ export function PresenceToggles({
   return (
     <div className="presence-toggles">
       <label className="toggle-row">
-        <span className="toggle-label">
-          <span className="toggle-icon">📍</span>
-          In office today
-        </span>
+        <span className="toggle-label">In office today</span>
         <input
           type="checkbox"
           checked={inOfficeToday}
@@ -24,10 +21,7 @@ export function PresenceToggles({
         <span className="toggle-switch" />
       </label>
       <label className="toggle-row">
-        <span className="toggle-label">
-          <span className="toggle-icon">📅</span>
-          In office tomorrow
-        </span>
+        <span className="toggle-label">In office tomorrow</span>
         <input
           type="checkbox"
           checked={inOfficeTomorrow}

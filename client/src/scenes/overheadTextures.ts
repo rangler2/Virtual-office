@@ -31,9 +31,10 @@ export function createLabelTexture(
   ctx.fillText(emoji, emojiCx, LABEL_HEIGHT_PX / 2 + 2);
 
   if (badge) {
-    ctx.font = `${Math.round(EMOJI_DRAW_SIZE * 0.22)}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+    ctx.font = '600 26px system-ui, sans-serif';
     ctx.textAlign = 'right';
-    ctx.fillText(badge, padX + EMOJI_DRAW_SIZE - 8, 36);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    ctx.fillText(badge, padX + EMOJI_DRAW_SIZE - 8, 40);
   }
 
   const nameX = padX + EMOJI_DRAW_SIZE + gap;
