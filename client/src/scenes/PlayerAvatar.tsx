@@ -74,8 +74,6 @@ export function PlayerAvatar({ player, isLocal, viewMode, chatMessages }: Player
             emoji={player.avatar}
             name={player.name}
             bubbleText={bubbleText}
-            inOfficeToday={player.inOfficeToday}
-            inOfficeTomorrow={player.inOfficeTomorrow}
           />
 
           <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
