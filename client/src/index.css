@@ -723,6 +723,10 @@ body,
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35);
   }
 
+  .sidebar.collapsed {
+    pointer-events: none;
+  }
+
   .sidebar.open {
     pointer-events: auto;
   }
