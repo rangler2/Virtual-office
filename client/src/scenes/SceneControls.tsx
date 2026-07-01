@@ -59,6 +59,7 @@ export function SceneControls({
   onLookChange,
 }: SceneControlsProps) {
   const { gl, camera, size } = useThree();
+  const pointerDown = useRef(false);
   const dragging = useRef(false);
   const pointerStart = useRef({ x: 0, y: 0 });
   const lastPointer = useRef({ x: 0, y: 0 });
@@ -94,6 +95,7 @@ export function SceneControls({
 
     const onPointerDown = (e: PointerEvent) => {
       if (e.button !== 0) return;
+      pointerDown.current = true;
       dragging.current = false;
       pointerStart.current = { x: e.clientX, y: e.clientY };
       lastPointer.current = { x: e.clientX, y: e.clientY };
@@ -101,6 +103,7 @@ export function SceneControls({
     };
 
     const onPointerMove = (e: PointerEvent) => {
+      if (!pointerDown.current || (e.buttons & 1) === 0) return;
       const totalDx = e.clientX - pointerStart.current.x;
       const totalDy = e.clientY - pointerStart.current.y;
 
@@ -121,11 +124,14 @@ export function SceneControls({
     };
 
     const onPointerUp = (e: PointerEvent) => {
+      if (!pointerDown.current) return;
+
       if (!dragging.current) {
         const target = raycastGround(camera, size, e.clientX, e.clientY);
         if (target) onWalkTarget(target.x, target.z);
       }
 
+      pointerDown.current = false;
       dragging.current = false;
       if (el.hasPointerCapture(e.pointerId)) {
         el.releasePointerCapture(e.pointerId);
@@ -133,6 +139,7 @@ export function SceneControls({
     };
 
     const onPointerCancel = (e: PointerEvent) => {
+      pointerDown.current = false;
       dragging.current = false;
       if (el.hasPointerCapture(e.pointerId)) {
         el.releasePointerCapture(e.pointerId);
