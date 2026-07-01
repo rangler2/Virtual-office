@@ -684,10 +684,6 @@ body,
   font-size: 10px;
 }
 
-.player-label-name {
-  font-weight: 600;
-}
-
 .player-label-badges {
   font-size: 8px;
 }
@@ -757,20 +753,8 @@ body,
   }
 
   .player-chat-bubble {
-    max-width: 100px;
-    padding: 0.2rem 0.35rem;
-    font-size: 7px;
-  }
-
-  .player-label {
-    font-size: 7px;
-  }
-
-  .player-label-avatar {
-    font-size: 8px;
-  }
-
-  .player-label-badges {
+    max-width: 90px;
+    padding: 0.2rem 0.3rem;
     font-size: 7px;
   }
 }

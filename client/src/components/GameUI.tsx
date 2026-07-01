@@ -118,7 +118,9 @@ export function GameUI({
         <div className="controls-hint">
           <h4>Controls</h4>
           <p className="controls-desktop">WASD or arrow keys to move</p>
-          <p className="controls-mobile">Drag the view to pan · Tap ☰ for menu</p>
+          <p className="controls-mobile">
+            Tap to walk · Drag to pan (map) or look (1st person)
+          </p>
         </div>
       </aside>
 
