@@ -11,8 +11,6 @@ interface PlayerOverheadProps {
   emoji: string;
   name: string;
   bubbleText: string | null;
-  inOfficeToday: boolean;
-  inOfficeTomorrow: boolean;
 }
 
 const LABEL_HEIGHT = 0.96;
@@ -22,14 +20,10 @@ export function PlayerOverhead({
   emoji,
   name,
   bubbleText,
-  inOfficeToday,
-  inOfficeTomorrow,
 }: PlayerOverheadProps) {
-  const badge = [inOfficeToday && '📍', inOfficeTomorrow && '📅'].filter(Boolean).join('');
-
   const labelTexture = useMemo(
-    () => createLabelTexture(emoji, name, badge),
-    [emoji, name, badge],
+    () => createLabelTexture(emoji, name),
+    [emoji, name],
   );
   const bubbleTexture = useMemo(
     () => (bubbleText ? createBubbleTexture(bubbleText) : null),

@@ -6,7 +6,6 @@ const LABEL_HEIGHT_PX = 192;
 export function createLabelTexture(
   emoji: string,
   name: string,
-  badge = '',
 ): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d')!;
@@ -30,12 +29,6 @@ export function createLabelTexture(
   const emojiCx = padX + EMOJI_DRAW_SIZE / 2;
   ctx.fillText(emoji, emojiCx, LABEL_HEIGHT_PX / 2 + 2);
 
-  if (badge) {
-    ctx.font = `${Math.round(EMOJI_DRAW_SIZE * 0.22)}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
-    ctx.textAlign = 'right';
-    ctx.fillText(badge, padX + EMOJI_DRAW_SIZE - 8, 36);
-  }
-
   const nameX = padX + EMOJI_DRAW_SIZE + gap;
   ctx.font = nameFont;
   ctx.textAlign = 'left';
@@ -53,8 +46,8 @@ export function createLabelTexture(
 }
 
 /** @deprecated Use createLabelTexture */
-export function createEmojiTexture(emoji: string, badge = ''): THREE.CanvasTexture {
-  return createLabelTexture(emoji, '', badge);
+export function createEmojiTexture(emoji: string): THREE.CanvasTexture {
+  return createLabelTexture(emoji, '');
 }
 
 function roundRect(
