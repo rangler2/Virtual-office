@@ -72,6 +72,7 @@ export function PlayerAvatar({ player, isLocal, viewMode, chatMessages }: Player
 
           <PlayerOverhead
             emoji={player.avatar}
+            name={player.name}
             bubbleText={bubbleText}
             inOfficeToday={player.inOfficeToday}
             inOfficeTomorrow={player.inOfficeTomorrow}

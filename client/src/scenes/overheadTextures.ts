@@ -1,29 +1,60 @@
 import * as THREE from 'three';
 
-const EMOJI_SIZE = 128;
+const EMOJI_DRAW_SIZE = 96;
+const LABEL_HEIGHT_PX = 96;
 
-export function createEmojiTexture(emoji: string, badge = ''): THREE.CanvasTexture {
+export function createLabelTexture(
+  emoji: string,
+  name: string,
+  badge = '',
+): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
-  canvas.width = EMOJI_SIZE;
-  canvas.height = EMOJI_SIZE;
   const ctx = canvas.getContext('2d')!;
-  ctx.clearRect(0, 0, EMOJI_SIZE, EMOJI_SIZE);
+  const padX = 8;
+  const gap = 6;
+  const nameFont = '600 28px system-ui, sans-serif';
+  const displayName = name.length > 14 ? `${name.slice(0, 13)}…` : name;
+
+  ctx.font = nameFont;
+  const nameWidth = Math.ceil(ctx.measureText(displayName).width);
+  const width = padX + EMOJI_DRAW_SIZE + gap + nameWidth + padX;
+
+  canvas.width = width;
+  canvas.height = LABEL_HEIGHT_PX;
+
+  ctx.clearRect(0, 0, width, LABEL_HEIGHT_PX);
+
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = `${Math.round(EMOJI_SIZE * 0.62)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
-  ctx.fillText(emoji, EMOJI_SIZE / 2, EMOJI_SIZE / 2 + 2);
+  ctx.font = `${Math.round(EMOJI_DRAW_SIZE * 0.62)}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+  const emojiCx = padX + EMOJI_DRAW_SIZE / 2;
+  ctx.fillText(emoji, emojiCx, LABEL_HEIGHT_PX / 2 + 2);
 
   if (badge) {
-    ctx.font = `${Math.round(EMOJI_SIZE * 0.22)}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+    ctx.font = `${Math.round(EMOJI_DRAW_SIZE * 0.22)}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
     ctx.textAlign = 'right';
-    ctx.fillText(badge, EMOJI_SIZE - 8, 22);
+    ctx.fillText(badge, padX + EMOJI_DRAW_SIZE - 4, 18);
   }
+
+  const nameX = padX + EMOJI_DRAW_SIZE + gap;
+  ctx.font = nameFont;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+  ctx.fillText(displayName, nameX + 1, LABEL_HEIGHT_PX / 2 + 1);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(displayName, nameX, LABEL_HEIGHT_PX / 2);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
+}
+
+/** @deprecated Use createLabelTexture */
+export function createEmojiTexture(emoji: string, badge = ''): THREE.CanvasTexture {
+  return createLabelTexture(emoji, '', badge);
 }
 
 function roundRect(
@@ -102,8 +133,13 @@ export function createBubbleTexture(text: string): THREE.CanvasTexture {
   return texture;
 }
 
-/** World-space width/height for a bubble texture plane. */
-export function bubblePlaneSize(texture: THREE.CanvasTexture, height = 0.22) {
+/** World-space width/height for a label or bubble texture plane. */
+export function texturePlaneSize(texture: THREE.CanvasTexture, height: number) {
   const aspect = texture.image.width / texture.image.height;
   return { width: height * aspect, height };
+}
+
+/** World-space width/height for a bubble texture plane. */
+export function bubblePlaneSize(texture: THREE.CanvasTexture, height = 0.22) {
+  return texturePlaneSize(texture, height);
 }
